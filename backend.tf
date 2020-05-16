@@ -1,14 +1,31 @@
-provider "aws" {
-  profile = "personal_dev"
-  region  = "eu-west-1"
+terraform {
+  backend "remote" {
+    organization = "foo"
+
+    workspaces {
+      name = "bar"
+    }
+  }
 }
 
-terraform {
-  backend "s3" {
-    bucket  = "steph-dev-account-bucket"
-    key     = "state/terraform.tfstate"
-    region  = "eu-west-1"
-    encrypt = "true"
-    profile = "personal_dev"
-  }
+provider "aws" {
+  region  = "us-east-1"
+  version = "~> 2.62.0"
+}
+
+provider "archive" {
+  version = "~> 1.3.0"
+}
+
+provider "external" {
+  version = "~> 1.2.0"
+}
+
+provider "null" {
+  version = "~> 2.1.2"
+
+
+provider "template" {
+  version = "~> 2.1.2"
+}
 }

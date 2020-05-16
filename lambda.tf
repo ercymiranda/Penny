@@ -9,17 +9,17 @@ data "archive_file" "athena_zip" {
 resource "aws_lambda_function" "athena" {
   filename         = "${path.module}/output/athenalambda.zip"
   function_name    = "athena"
-  role             = "${aws_iam_role.iam_role_for_athena.arn}"
+  role             = aws_iam_role.iam_role_for_athena.arn
   handler          = "athenalambda.lambda_handler"
-  source_code_hash = "${data.archive_file.athena_zip.output_base64sha256}"
+  source_code_hash = data.archive_file.athena_zip.output_base64sha256
   runtime          = "python2.7"
   memory_size      = "512"
   timeout          = "150"
 
   environment {
     variables = {
-      BUCKET_NAME = "${aws_s3_bucket.s3_bucket.id}"
-      DATABASE    = "${var.athena_db_name}"
+      BUCKET_NAME = aws_s3_bucket.s3_bucket.id
+      DATABASE    = var.athena_db_name
     }
   }
 }
@@ -34,17 +34,17 @@ data "archive_file" "athena_partition_zip" {
 resource "aws_lambda_function" "athena_partition" {
   filename         = "${path.module}/output/athenapartition.zip"
   function_name    = "athenapartition"
-  role             = "${aws_iam_role.iam_role_for_athena.arn}"
+  role             = aws_iam_role.iam_role_for_athena.arn
   handler          = "athenapartition.lambda_handler"
-  source_code_hash = "${data.archive_file.athena_zip.output_base64sha256}"
+  source_code_hash = data.archive_file.athena_zip.output_base64sha256
   runtime          = "python2.7"
   memory_size      = "512"
   timeout          = "150"
 
   environment {
     variables = {
-      BUCKET_NAME = "${aws_s3_bucket.s3_bucket.id}"
-      DATABASE    = "${var.athena_db_name}"
+      BUCKET_NAME = aws_s3_bucket.s3_bucket.id
+      DATABASE    = var.athena_db_name
     }
   }
 }
@@ -60,16 +60,16 @@ data "archive_file" "crawler_cf_zip" {
 resource "aws_lambda_function" "crawler_cf" {
   filename         = "${path.module}/output/crawler_cf.zip"
   function_name    = "crawler_cf"
-  role             = "${aws_iam_role.iam_role_for_athena.arn}"
+  role             = aws_iam_role.iam_role_for_athena.arn
   handler          = "crawler_cf.lambda_handler"
-  source_code_hash = "${data.archive_file.crawler_cf_zip.output_base64sha256}"
+  source_code_hash = data.archive_file.crawler_cf_zip.output_base64sha256
   runtime          = "python3.7"
   memory_size      = "512"
   timeout          = "150"
 
   environment {
     variables = {
-      BUCKET_NAME = "${aws_s3_bucket.s3_bucket.id}"
+      BUCKET_NAME = aws_s3_bucket.s3_bucket.id
     }
   }
 }
@@ -77,7 +77,8 @@ resource "aws_lambda_function" "crawler_cf" {
 resource "aws_lambda_permission" "allow_bucket" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.crawler_cf.arn}"
+  function_name = aws_lambda_function.crawler_cf.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = "${aws_s3_bucket.s3_bucket.arn}"
+  source_arn    = aws_s3_bucket.s3_bucket.arn
 }
+

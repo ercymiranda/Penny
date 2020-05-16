@@ -1,5 +1,6 @@
 module "lambda_ri_payback" {
-  source = "github.com/claranet/terraform-aws-lambda.git?ref=v0.11.3"
+  //  source = "github.com/claranet/terraform-aws-lambda.git?ref=v0.11.3"
+  source = "github.com/claranet/terraform-aws-lambda.git"
 
   function_name = "RI_payback"
   description   = "Deployment deploy status task"
@@ -11,20 +12,17 @@ module "lambda_ri_payback" {
   source_path = "${path.module}/source/ri_payback"
 
   // Attach a policy.
+  policy = {
+    json = data.aws_iam_policy_document.athena_policy.json
+  }
 
-  attach_policy = true
-  policy        = "${data.aws_iam_policy_document.athena_policy.json}"
-  // Add a dead letter queue.
-  attach_dead_letter_config = false
-  // Deploy into a VPC.
-  attach_vpc_config = false
   // Add environment variables.
-  environment {
-    variables {
+  environment = {
+    variables = {
       BUCKET_LOCATION = "s3://${aws_s3_bucket.s3_bucket.id}/Quick/RI"
-      DATABASE        = "${var.athena_db_name}"
+      DATABASE        = var.athena_db_name
       TABLE           = "mybillingreport"
-      REGION          = "${var.region}"
+      REGION          = var.region
     }
   }
 }
@@ -89,7 +87,7 @@ data "aws_iam_policy_document" "athena_policy" {
 
     resources = [
       "${aws_s3_bucket.s3_bucket.arn}/*",
-      "${aws_s3_bucket.s3_bucket.arn}",
+      aws_s3_bucket.s3_bucket.arn,
     ]
   }
 }
@@ -97,20 +95,21 @@ data "aws_iam_policy_document" "athena_policy" {
 resource "aws_lambda_permission" "allow_cloudwatch_ri_payback" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = "${module.lambda_ri_payback.function_name}"
+  function_name = module.lambda_ri_payback.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = "${aws_cloudwatch_event_rule.ri_payback_cloudwatch_rule.arn}"
+  source_arn    = aws_cloudwatch_event_rule.ri_payback_cloudwatch_rule.arn
 
-  depends_on = ["module.lambda_ri_payback"]
+  depends_on = [module.lambda_ri_payback]
 }
 
 resource "aws_cloudwatch_event_rule" "ri_payback_cloudwatch_rule" {
   name                = "ri_payback_lambda_trigger"
-  schedule_expression = "${var.ri_payback_cron}"
+  schedule_expression = var.ri_payback_cron
 }
 
 resource "aws_cloudwatch_event_target" "ri_payback_lambda" {
-  rule      = "${aws_cloudwatch_event_rule.ri_payback_cloudwatch_rule.name}"
+  rule      = aws_cloudwatch_event_rule.ri_payback_cloudwatch_rule.name
   target_id = "lambda_target"
-  arn       = "${module.lambda_ri_payback.function_arn}"
+  arn       = module.lambda_ri_payback.function_arn
 }
+

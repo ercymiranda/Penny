@@ -1,5 +1,6 @@
 module "lambda_cur" {
-  source = "github.com/claranet/terraform-aws-lambda.git?ref=v0.11.3"
+  //  source = "github.com/claranet/terraform-aws-lambda.git?ref=v0.11.3"
+  source = "github.com/claranet/terraform-aws-lambda.git"
 
   function_name = "lambda_cur"
   description   = "Deployment deploy status task"
@@ -11,17 +12,14 @@ module "lambda_cur" {
   source_path = "${path.module}/source/cur"
 
   // Attach a policy.
+  policy = {
+    json = data.aws_iam_policy_document.cur_policy.json
+  }
 
-  attach_policy = true
-  policy        = "${data.aws_iam_policy_document.cur_policy.json}"
-  // Add a dead letter queue.
-  attach_dead_letter_config = false
-  // Deploy into a VPC.
-  attach_vpc_config = false
   // Add environment variables.
-  environment {
-    variables {
-      BUCKET_NAME = "${aws_s3_bucket.s3_bucket.id}"
+  environment = {
+    variables = {
+      BUCKET_NAME = aws_s3_bucket.s3_bucket.id
     }
   }
 }
@@ -111,7 +109,8 @@ data "aws_iam_policy_document" "cur_policy" {
 resource "aws_lambda_permission" "allow_cloudwatch_cur" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = "${module.lambda_cur.function_name}"
+  function_name = module.lambda_cur.function_name
   principal     = "events.amazonaws.com"
-  depends_on    = ["module.lambda_cur"]
+  depends_on    = [module.lambda_cur]
 }
+

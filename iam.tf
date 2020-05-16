@@ -23,5 +23,6 @@ data "aws_iam_policy_document" "billing_policy" {
 resource "aws_iam_policy" "billing_policy" {
   name   = "QuickSightPolicy"
   path   = "/"
-  policy = "${data.aws_iam_policy_document.billing_policy.json}"
+  policy = data.aws_iam_policy_document.billing_policy.json
 }
+

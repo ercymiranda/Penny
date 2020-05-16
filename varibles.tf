@@ -3,11 +3,11 @@ variable "project" {
 }
 
 variable "bucket_name" {
-  default = "buisnesspennybucket"
+  default = "penny-bucket-112233445566"
 }
 
 variable "region" {
-  default = "eu-west-1"
+  default = "us-east-1"
 }
 
 variable "ri_payback_cron" {
@@ -31,7 +31,7 @@ variable "gcp_billing_cron" {
 }
 
 variable "account_id" {
-  default = ""
+  default = "112233445566"
 }
 
 variable "API" {
@@ -50,7 +50,7 @@ variable "gcp_billing_key" {
   default = ""
 }
 
-
 variable "user_arn" {
   default = ""
 }
+

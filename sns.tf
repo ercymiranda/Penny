@@ -3,7 +3,7 @@ resource "aws_sns_topic" "aws_penny" {
 }
 
 resource "aws_sns_topic_policy" "default" {
-  arn = "${aws_sns_topic.aws_penny.arn}"
+  arn = aws_sns_topic.aws_penny.arn
 
   policy = <<POLICY
 {
@@ -51,4 +51,6 @@ resource "aws_sns_topic_policy" "default" {
   ]
 }
 POLICY
+
 }
+

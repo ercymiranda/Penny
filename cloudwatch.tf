@@ -6,7 +6,8 @@ resource "aws_cloudwatch_event_rule" "monthly_partition_rule" {
 
 #cron job in cloudwatch to run lambda
 resource "aws_cloudwatch_event_target" "monthly_partition_rule" {
-  rule      = "${aws_cloudwatch_event_rule.monthly_partition_rule.name}"
+  rule      = aws_cloudwatch_event_rule.monthly_partition_rule.name
   target_id = "lambda_partition_target"
-  arn       = "${aws_lambda_function.athena_partition.arn}"
+  arn       = aws_lambda_function.athena_partition.arn
 }
+

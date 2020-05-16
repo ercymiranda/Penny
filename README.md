@@ -1,4 +1,6 @@
 # Penny
+> Originally forked from https://github.com/road-to-finops/Penny
+
 This is a tool to help with AWS billing and reporting.
 
 The goal for this deployment is to start collecting your Cost and Uage report from AWS in a format for athena to read. 
@@ -98,8 +100,8 @@ After you have data in the anthea table you can put it in AWS Quicksight
 https://aws.amazon.com/blogs/big-data/query-and-visualize-aws-cost-and-usage-data-using-amazon-athena-and-amazon-quicksight/
 
 #### Notes
-- Terraform v0.11.13
-- Python 3.6.5 
+- Terraform v0.12.21
+- Python 3.6.4
  
 
 
